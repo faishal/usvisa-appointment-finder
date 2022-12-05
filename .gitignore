@@ -1,1 +1,4 @@
 config/app-config.properties
+src/scrapper.log
+src/__pycache__/
+src/~/

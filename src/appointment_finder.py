@@ -19,9 +19,13 @@ def log_in(driver):
     print('Logging in.')
 
     # Clicking the OK button in the "You need to sign in or sign up before continuing" dialog
-    ok_button = driver.find_element(By.XPATH, '/html/body/div[6]/div[3]/div/button')
-    if ok_button:
-        ok_button.click()
+    # ok_button = driver.find_element(By.XPATH, '/html/body/div[6]/div[3]/div/button')
+    # if ok_button:
+    #     ok_button.click()
+    try:
+        driver.find_element(By.XPATH, '/html/body/div[7]/div[3]/div/button').click()
+    except:
+        pass
 
     # Filling the user and password
     user_box = driver.find_element(By.NAME, 'user[email]')
@@ -30,15 +34,15 @@ def log_in(driver):
     password_box.send_keys(password)
 
     # Clicking the checkbox
-    driver.find_element(By.XPATH, '//*[@id="new_user"]/div[3]/label/div').click()
+    driver.execute_script('document.evaluate(\'//*[@id="sign_in_form"]/div[3]/label/a\', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.remove()')
+    driver.find_element(By.XPATH, '//*[@id="sign_in_form"]/div[3]/label').click()
 
     # Clicking 'Sign in'
-    driver.find_element(By.XPATH, '//*[@id="new_user"]/p[1]/input').click()
-
+    driver.find_element(By.XPATH, '//*[@id="sign_in_form"]/p[1]/input').click()
+    
     # Waiting for the page to load.
     time.sleep(2)
     print('Logged in.')
-
 
 def is_worth_notifying(year, month, days):
     first_available_date_object = datetime.datetime.strptime(f'{year}-{month}-{days[0]}', "%Y-%B-%d")
@@ -96,6 +100,11 @@ def check_appointments(driver):
 def main():
     chrome_options = Options()
     chrome_options.add_argument("--headless")
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--profile-directory=Default')
+    chrome_options.add_argument('--user-data-dir=~/.config/google-chrome')
 
     # Initialize the chromedriver (must be installed and in PATH)
     # Needed to implement the headless option
