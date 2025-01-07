@@ -8,7 +8,7 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
-from creds import username, password, facility_name, latest_notification_date, seconds_between_checks
+from creds import user_agent, username, password, facility_name, latest_notification_date, seconds_between_checks
 from telegram import send_message, send_photo
 from urls import BASE_URL, SIGN_IN_URL, SCHEDULE_URL, APPOINTMENTS_URL
 
@@ -82,7 +82,7 @@ def check_appointments(driver):
                 print(message)
 
                 if not is_worth_notifying(year, month, available_days):
-                    print("Not worth notifying.")
+                    print(f"No available date found before {datetime.datetime.strptime(latest_notification_date, '%Y-%m-%d')}")
                     return
 
                 send_message(message)
@@ -96,7 +96,14 @@ def check_appointments(driver):
 
 def main():
     chrome_options = Options()
+    chrome_options.add_argument(f'user-agent={user_agent}')
     chrome_options.add_argument("--headless")
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--profile-directory=Default')
+    chrome_options.add_argument('--user-data-dir=./tmp/.config/google-chrome')
+    chrome_options.add_argument('--window-size=1920,1080')
 
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
@@ -107,6 +114,7 @@ def main():
         try:
             check_appointments(driver)
         except Exception as err:
+            driver.get_screenshot_as_file(f"logs/{current_time}-screenshot.png")
             print(f'Exception: {err}')
 
         time.sleep(seconds_between_checks)

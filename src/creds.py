@@ -1,8 +1,11 @@
 from jproperties import Properties
 
 configs = Properties()
-with open('../config/app-config.properties', 'rb') as config_file:
+with open('./config/app-config.properties', 'rb') as config_file:
     configs.load(config_file)
+
+# Browser user agent
+user_agent = configs.get('user_agent').data
 
 # ais.usvisa-info.com credentials
 
